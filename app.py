@@ -138,21 +138,28 @@ def hypothesis_test():
         observed_stat = intercept
         hypothesized_value = beta0
 
-    if test_type == "greater":
-        p_value = np.mean(simulated_stats >= observed_stat)
-    elif test_type == "less":
-        p_value = np.mean(simulated_stats <= observed_stat)
-    else: 
+    print(test_type)
+    if test_type == ">":
+        p_value = np.mean(simulated_stats > observed_stat)
+        test_description = "Greater than (>)"
+    elif test_type == "<":
+        p_value = np.mean(simulated_stats < observed_stat)
+        test_description = "Less than (<)"
+    else:
         p_value = 2 * np.mean(np.abs(simulated_stats - hypothesized_value) >= np.abs(observed_stat - hypothesized_value))
+        test_description = "Not equal to (≠)"
 
-    fun_message = "Wow!" if p_value <= 0.0001 else None
+    fun_message = "Wow! This is a rare event!" if p_value <= 0.0001 else None
 
     plt.figure(figsize=(10, 6))
-    plt.hist(simulated_stats, bins=30, alpha=0.7)
-    plt.axvline(observed_stat, color='r', linestyle='--', label='Observed')
-    plt.axvline(hypothesized_value, color='g', linestyle='--', label='Hypothesized')
-    plt.title(f'Distribution of {parameter.capitalize()}s with p-value = {p_value:.4f}')
+    plt.hist(simulated_stats, bins=30, alpha=0.7, label='Simulated Statistics')
+    plt.axvline(observed_stat, color='r', linestyle='--', label=f'Observed {parameter.capitalize()}: {observed_stat:.4f}')
+    plt.axvline(hypothesized_value, color='b', linestyle='-', label=f'Hypothesized {parameter.capitalize()} (H₀): {hypothesized_value:.4f}')
+    plt.title(f'Hypothesis Test for {parameter.capitalize()}')
+    plt.xlabel(parameter.capitalize())
+    plt.ylabel('Frequency')
     plt.legend()
+    plt.tight_layout()
     plt.savefig('static/plot3.png')
     plt.close()
 
@@ -161,6 +168,7 @@ def hypothesis_test():
         plot1="static/plot1.png",
         plot2="static/plot2.png",
         plot3='static/plot3.png',
+        type_test=test_type,
         parameter=parameter,
         observed_stat=observed_stat,
         hypothesized_value=hypothesized_value,
